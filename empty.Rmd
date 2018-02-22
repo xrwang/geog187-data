@@ -7,7 +7,8 @@ output: github_document
 ```{r}
 library(dplyr)
 library(tidyr)
-a <- readr::read_tsv('air-quality-data/China_Station_Metadata.txt')
+a <- readr::read_tsv('air-quality-data/China_Station_Metadata.txt',
+                         na = c("NA"))
 
 colnames(a)[1] <- "station_name"
 colnames(a)[2] <- "latitude"
@@ -21,14 +22,21 @@ a <- filter(a, !grepl('Japan', name)) %>%
    filter(!grepl('Taiwan',name))%>%
   filter(!grepl('Macau',name))
 
-b <- readr::read_tsv('air-quality-data/China_Station_O3.txt') %>%
-  filter(Month==4, Day==5, Hour==3)
-b
+```
 
+do ozone
+```{r}
+
+b <- readr::read_tsv('air-quality-data/China_Station_O3.txt', na = c("NA")) %>%
+  filter(Month==4, Day==5, Hour==3)
+
+drops <- c("% Year","Month", "Day", "Hour")
+b <- b[ , !(names(b) %in% drops)]
 
 b_filtered <- b %>%
   t() %>%
   as.data.frame() 
+
 
  
  b_filtered <- cbind(rownames(b_filtered), b_filtered)
@@ -39,8 +47,19 @@ b_filtered$station_name <- as.numeric(b_filtered$station_name)
  
 b_filtered$values_ozone <- as.numeric(b_filtered$values_ozone)
 
-c <- readr::read_tsv('air-quality-data/China_Station_NO2.txt') %>%
+
+ozone <- left_join(a, b_filtered)
+
+```
+
+do no2
+```{r}
+
+c <- readr::read_tsv('air-quality-data/China_Station_NO2.txt', na= c("NA")) %>%
   filter(Month==4, Day==5, Hour==3)
+
+
+c <- c[ , !(names(c) %in% drops)]
 
 c_filtered <- c %>%
   t() %>%
@@ -51,26 +70,46 @@ c_filtered <- c %>%
  colnames(c_filtered) <- c("station_name","values_no2")
  c_filtered$station_name <- as.numeric(c_filtered$station_name)
  c_filtered$values_no2 <- as.numeric(c_filtered$values_no2)
-
  
-  c_filtered
-d <- left_join(a, b_filtered)
-
-e <- left_join(a, c_filtered)
 
 
+no2 <- left_join(a, c_filtered)
 
 
+```
+hi
+
+```{r}
+
+write.csv(ozone, file = "ozone.csv")
+write.csv(no2, file = "no2.csv")
 ```
 
 
 
 
-
-hi
+try pm2.5 data
 
 ```{r}
+q <- readr::read_tsv('air-quality-data/China_Station_PM25.txt',
+                  col_names = c('year','month','day','hour',seq_len(2925)),
+                  na = c("NA"))
+q_select <- q %>%
+  filter(month==5,day==5, hour==3)
 
-write.csv(d, file = "ozone.csv")
-write.csv(e, file = "no2.csv")
+drops <- c("year","month", "day", "hour")
+q_select <- q_select[ , !(names(q_select) %in% drops)]
+
+
+q_pm25 <- q_select %>%
+   t() %>%
+  as.data.frame() 
+
+q_pm25
+
+ q_pm25 <- cbind(rownames(q_pm25), q_pm25)
+ rownames(q_pm25) <- NULL
+ colnames(q_pm25) <- c("station_name","values_no2")
+ q_pm25$station_name <- as.numeric(q_pm25$station_name)
+ q_pm25$values_no2 <- as.numeric(q_pm25$values_no2)
 ```
