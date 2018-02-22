@@ -99,17 +99,25 @@ q_select <- q %>%
 
 drops <- c("year","month", "day", "hour")
 q_select <- q_select[ , !(names(q_select) %in% drops)]
-
+q_select
 
 q_pm25 <- q_select %>%
    t() %>%
-  as.data.frame() 
-
-q_pm25
+  as.data.frame(stringsAsFactors = FALSE) 
 
  q_pm25 <- cbind(rownames(q_pm25), q_pm25)
  rownames(q_pm25) <- NULL
- colnames(q_pm25) <- c("station_name","values_no2")
- q_pm25$station_name <- as.numeric(q_pm25$station_name)
- q_pm25$values_no2 <- as.numeric(q_pm25$values_no2)
+ colnames(q_pm25) <- c("station_name","values_pm25")
+ q_pm25
+ 
+ q_pm25$station_name <- as.numeric(as.character(q_pm25$station_name))
+ q_pm25$values_pm25 <- as.numeric(as.character(q_pm25$values_pm25))
+ q_pm25
+ 
+ pm25 <- left_join(a,q_pm25)
+ 
+ pm25
+ 
+ write.csv(pm25, file = "pm25_2014_may_5.csv")
+
 ```
