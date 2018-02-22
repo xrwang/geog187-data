@@ -18,34 +18,48 @@ a <- filter(a, !grepl('Japan', name)) %>%
    filter(!grepl('Korea',name)) %>%
    filter(!grepl('Thailand',name)) %>%
    filter(!grepl('Mongolia',name)) %>%
-   filter(!grepl('Taiwan',name)) 
-
-
-factor(a$station_name)
-
+   filter(!grepl('Taiwan',name))%>%
+  filter(!grepl('Macau',name))
+a
 
 b <- readr::read_tsv('air-quality-data/China_Station_O3.txt') %>%
   filter(Month==4, Day==5, Hour==3)
 
-# drop.cols <- c(as.character(c(seq(1264, 2929))), 'Month', 'Day', 'Hour', '% Year')
-# remove <- c('2925','2926','2927','2928','2929')
-# drop.cols <- drop.cols [! drop.cols %in% remove]
+c <- readr::read_tsv('air-quality-data/China_Station_NO2.txt') 
 
-#b
+c
+# c_filtered <- c %>%
+#   t() %>%
+#   as.data.frame()
+# 
+# c_filtered <- cbind(rownames(c_filtered), c_filtered)
+# rownames(c_filtered) <- NULL
+# colnames(c_filtered) <- c("station_name","values_pm25")
+# c_filtered$station_name <- as.numeric(c_filtered$station_name)
 
-b_filtered <- b %>% 
-  select(-one_of(drop.cols)) %>%
-  mutate(., a=NA) %>%
+ # drop.cols <- c('Month', 'Day', 'Hour', '% Year')
+ # remove <- c('2925','2926','2927','2928','2929')
+ # drop.cols <- drop.cols [! drop.cols %in% remove]
+
+b
+
+b_filtered <- b %>%
+  select(-c(Month, Day, Hour, Year))
   t() %>%
-  as.data.frame()
+  as.data.frame() 
 
 
-b_filtered <- cbind(rownames(b_filtered), b_filtered)
-rownames(b_filtered) <- NULL
-colnames(b_filtered) <- c("station_name","values")
+ b_filtered <- cbind(rownames(b_filtered), b_filtered)
+ rownames(b_filtered) <- NULL
+ colnames(b_filtered) <- c("station_name","values_ozone")
+ 
+ b_filtered$station_name <- as.numeric(b_filtered$station_name)
 
 
-d <- left_join(a, b_filtered)
+ b_filtered
 
-d
+# d <- left_join(a, b_filtered)
+
+# e <- left_join(a, c_filtered)
+# e
 ```
